@@ -1,0 +1,251 @@
+<?php
+// Usamos nuestro gestor de sesión y la conexión a la BD
+require_once 'session_manager.php';
+require_once 'conexion.php';
+
+// --- CONSULTAS PARA EL CONTENIDO DESTACADO ---
+$sql_canales = "SELECT c.*, cat.nombre as categoria_nombre FROM canales c LEFT JOIN categorias cat ON c.id_categoria = cat.id WHERE c.activo = 1 ORDER BY RAND() LIMIT 8";
+$stmt_canales = $pdo->query($sql_canales);
+$canales = $stmt_canales->fetchAll();
+
+$sql_peliculas = "SELECT p.*, cat.nombre as categoria_nombre FROM peliculas p LEFT JOIN categorias cat ON p.id_categoria = cat.id WHERE p.activo = 1 ORDER BY RAND() LIMIT 8";
+$stmt_peliculas = $pdo->query($sql_peliculas);
+$peliculas = $stmt_peliculas->fetchAll();
+?>
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaCanchaTV - Inicio</title>
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css" />
+
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Estilos personalizados para el menú de usuario */
+    .user-dropdown .dropdown-toggle::after {
+      display: none;
+    }
+
+    .user-dropdown .dropdown-menu {
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .user-dropdown .dropdown-item {
+      font-weight: 500;
+    }
+
+    .user-dropdown .dropdown-item i {
+      margin-right: 10px;
+      width: 20px;
+    }
+
+    .user-dropdown-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    /* --- ¡CORRECCIÓN DE ESTILO PARA EL CONTENEDOR FLUIDO! --- */
+    .container-fluid {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .content-wrapper {
+      padding-left: 24px;
+      /* Añadimos padding para que el contenido no se pegue al borde */
+      padding-right: 24px;
+    }
+
+    /* Botones de Login/Registro en la barra de navegación */
+    .nav-right .btn-nav-login,
+    .nav-right .btn-nav-registro {
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+      white-space: nowrap;
+    }
+
+    .nav-right .btn-nav-login {
+      color: var(--primary-color);
+      border: 1px solid var(--border-color);
+      margin-right: 8px;
+    }
+
+    .nav-right .btn-nav-login:hover {
+      background-color: var(--primary-color-light);
+    }
+
+    .nav-right .btn-nav-registro {
+      background-color: #0d6efd;
+      color: #fff;
+      border: 1px solid transparent;
+    }
+
+    .nav-right .btn-nav-registro:hover {
+      background-color: #0b5ed7;
+    }
+
+    /* Para que el enlace activo en el sidebar se vea resaltado */
+    .sidebar .link-item.active {
+      background-color: var(--primary-color-light);
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+  </style>
+</head>
+
+<body class="sidebar-hidden">
+
+  <!-- ¡AQUÍ ESTÁ EL CAMBIO PRINCIPAL! Usamos container-fluid -->
+  <div class="container-fluid">
+    <!-- Header / Navbar -->
+    <header>
+      <nav class="navbar">
+        <div class="nav-section nav-left">
+          <button class="nav-button menu-button"><i class="uil uil-bars"></i></button>
+          <a href="index.php" class="nav-logo">
+            <img src="img/logo.png" alt="Logo La Cancha TV" class="logo-image" />
+            <h2 class="logo-text">LaCanchaTV</h2>
+          </a>
+        </div>
+
+        <div class="nav-section nav-center">
+          <form action="#" class="search-form">
+            <input type="search" placeholder="Buscar contenido..." class="search-input" required />
+            <button class="nav-button search-button"><i class="uil uil-search"></i></button>
+          </form>
+          <button class="nav-button mic-button">
+            <i class="uil uil-microphone"></i>
+          </button>
+        </div>
+
+        <div class="nav-section nav-right">
+          <button class="nav-button theme-button"><i class="uil uil-moon"></i></button>
+
+          <?php if ($is_logged_in): ?>
+            <div class="user-menu-container">
+              <button id="user-menu-button" class="nav-button">
+                <img src="img/user.png" alt="User Image" class="user-image" />
+              </button>
+              <ul id="user-menu" class="user-menu">
+                <li class="user-menu-header">
+                  <img src="img/user.png" alt="User Image" />
+                  <div class="user-details">
+                    <h6><?php echo htmlspecialchars($user_name); ?></h6>
+                    <small><?php echo $is_admin ? 'Administrador' : ($is_premium_member ? 'Miembro Premium' : 'Usuario'); ?></small>
+                  </div>
+                </li>
+                <li class="menu-item">
+                  <a href="#"><i class="uil uil-user-circle"></i> Mi Perfil</a>
+                </li>
+                <?php if ($is_admin): ?>
+                  <li class="menu-item">
+                    <a href="admin/index.php"><i class="uil uil-sliders-v-alt"></i> Panel Admin</a>
+                  </li>
+                <?php endif; ?>
+                <li class="menu-separator"></li>
+                <li class="menu-item">
+                  <a class="logout" href="logout.php"><i class="uil uil-signout"></i> Cerrar Sesión</a>
+                </li>
+              </ul>
+            </div>
+          <?php else: ?>
+            <a href="login.php" class="btn-nav-login">Iniciar Sesión</a>
+          <?php endif; ?>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Layout -->
+    <main class="main-layout">
+      <div class="screen-overlay"></div>
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="nav-section nav-left">
+          <button class="nav-button menu-button"><i class="uil uil-bars"></i></button>
+          <a href="index.php" class="nav-logo">
+            <img src="img/logo.png" alt="Logo" class="logo-image" />
+            <h2 class="logo-text">LaCanchaTV</h2>
+          </a>
+        </div>
+        <div class="links-container">
+          <div class="link-section">
+            <a href="index.php" class="link-item active"><i class="uil uil-estate"></i> Inicio</a>
+            <a href="vistas/canales.php" class="link-item"><i class="uil uil-tv-retro"></i> Canales</a>
+            <a href="vistas/peliculas.php" class="link-item"><i class="uil uil-film"></i> Películas</a>
+          </div>
+          <div class="section-separator"></div>
+          <div class="link-section">
+            <h4 class="section-title">Tu Cuenta</h4>
+            <a href="#" class="link-item"><i class="uil uil-user-square"></i> Mi Perfil</a>
+            <a href="#" class="link-item"><i class="uil uil-history"></i> Historial</a>
+            <a href="#" class="link-item"><i class="uil uil-star"></i> Mi Membresía</a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CONTENIDO DINÁMICO DEL INDEX -->
+      <div class="content-wrapper">
+
+        <!-- SECCIÓN DE CANALES DESTACADOS -->
+        <div class="mb-5">
+          <h3 class="mb-3">Canales Destacados</h3>
+          <div class="video-list">
+            <?php foreach ($canales as $canal): ?>
+              <a href="vistas/ver_canal.php?id=<?php echo $canal['id']; ?>" class="video-card">
+                <div class="thumbnail-container">
+                  <img src="<?php echo htmlspecialchars($canal['url_logo']); ?>" alt="Logo Canal" class="thumbnail" />
+                  <p class="duration live-badge">EN VIVO</p>
+                  <?php if ($canal['es_premium']): ?><p class="premium-badge-on-thumb">⭐</p><?php endif; ?>
+                </div>
+                <div class="video-info">
+                  <div class="video-details">
+                    <h2 class="title"><?php echo htmlspecialchars($canal['nombre']); ?></h2>
+                    <p class="channel-name"><?php echo htmlspecialchars($canal['categoria_nombre'] ?? 'General'); ?></p>
+                  </div>
+                </div>
+              </a>
+            <?php endforeach; ?>
+          </div>
+        </div>
+
+        <!-- SECCIÓN DE PELÍCULAS RECOMENDADAS -->
+        <div>
+          <h3 class="mb-3">Películas Recomendadas</h3>
+          <div class="video-list">
+            <?php foreach ($peliculas as $pelicula): ?>
+              <a href="vistas/ver_pelicula.php?id=<?php echo $pelicula['id']; ?>" class="video-card">
+                <div class="thumbnail-container">
+                  <img src="<?php echo htmlspecialchars($pelicula['url_poster']); ?>" alt="Póster Película" class="thumbnail" />
+                  <p class="duration"><?php echo htmlspecialchars($pelicula['duracion_minutos']); ?> min</p>
+                  <?php if ($pelicula['es_premium']): ?><p class="premium-badge-on-thumb">⭐</p><?php endif; ?>
+                </div>
+                <div class="video-info">
+                  <div class="video-details">
+                    <h2 class="title"><?php echo htmlspecialchars($pelicula['titulo']); ?></h2>
+                    <p class="channel-name"><?php echo htmlspecialchars($pelicula['categoria_nombre'] ?? 'General'); ?></p>
+                    <p class="views"><?php echo htmlspecialchars($pelicula['ano_lanzamiento']); ?></p>
+                  </div>
+                </div>
+              </a>
+            <?php endforeach; ?>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Linking custom script y Bootstrap JS -->
+  <script src="script.js"></script>
+
+</body>
+
+</html>
