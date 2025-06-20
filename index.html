@@ -1,17 +1,4 @@
-<?php
-// Usamos nuestro gestor de sesión y la conexión a la BD
-require_once 'session_manager.php';
-require_once 'conexion.php';
 
-// --- CONSULTAS PARA EL CONTENIDO DESTACADO ---
-$sql_canales = "SELECT c.*, cat.nombre as categoria_nombre FROM canales c LEFT JOIN categorias cat ON c.id_categoria = cat.id WHERE c.activo = 1 ORDER BY RAND() LIMIT 8";
-$stmt_canales = $pdo->query($sql_canales);
-$canales = $stmt_canales->fetchAll();
-
-$sql_peliculas = "SELECT p.*, cat.nombre as categoria_nombre FROM peliculas p LEFT JOIN categorias cat ON p.id_categoria = cat.id WHERE p.activo = 1 ORDER BY RAND() LIMIT 8";
-$stmt_peliculas = $pdo->query($sql_peliculas);
-$peliculas = $stmt_peliculas->fetchAll();
-?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -220,7 +207,7 @@ $peliculas = $stmt_peliculas->fetchAll();
         <div>
           <h3 class="mb-3">Películas Recomendadas</h3>
           <div class="video-list">
-            <?php foreach ($peliculas as $pelicula): ?>
+          
               <a href="vistas/ver_pelicula.php?id=<?php echo $pelicula['id']; ?>" class="video-card">
                 <div class="thumbnail-container">
                   <img src="<?php echo htmlspecialchars($pelicula['url_poster']); ?>" alt="Póster Película" class="thumbnail" />
@@ -235,7 +222,7 @@ $peliculas = $stmt_peliculas->fetchAll();
                   </div>
                 </div>
               </a>
-            <?php endforeach; ?>
+          
           </div>
         </div>
 
